@@ -1,0 +1,161 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using PassThePigs.App.Services;
+using PassThePigs.Core;
+using PassThePigs.Core.Ai;
+
+namespace PassThePigs.App.ViewModels;
+
+public partial class GameViewModel : ObservableObject
+{
+    private const int HumanIndex = 0;
+    private const int OpponentPauseMs = 700;   // between the opponent's rolls, so you can watch
+
+    private readonly Random _rng = new();
+    private PigGame _game = null!;
+    private IRollStrategy _opponent = null!;
+
+    [ObservableProperty] private int _turnNumber;
+    [ObservableProperty] private string _cpuName = "CPU";
+    [ObservableProperty] private int _youTotal;
+    [ObservableProperty] private int _cpuTotal;
+    [ObservableProperty] private string _caption = "";
+    [ObservableProperty] private string? _pig1;
+    [ObservableProperty] private string? _pig2;
+    [ObservableProperty] private string _resultText = "";
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(YouTurnLabel), nameof(CpuTurnLabel), nameof(YouCardStroke), nameof(CpuCardStroke))]
+    [NotifyCanExecuteChangedFor(nameof(RollCommand), nameof(PassCommand))]
+    private bool _isYourTurn;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(YouCardStroke), nameof(CpuCardStroke))]
+    [NotifyCanExecuteChangedFor(nameof(RollCommand), nameof(PassCommand))]
+    private bool _isGameOver;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(RollCommand), nameof(PassCommand))]
+    private bool _busy;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(YouTurnLabel), nameof(CpuTurnLabel))]
+    [NotifyCanExecuteChangedFor(nameof(PassCommand))]
+    private int _turnScore;
+
+    public string YouTurnLabel => IsYourTurn && TurnScore > 0 ? $"+{TurnScore}" : string.Empty;
+    public string CpuTurnLabel => !IsYourTurn && TurnScore > 0 ? $"+{TurnScore}" : string.Empty;
+
+    private static readonly Color Active = Color.FromArgb("#C2557A");
+    private static readonly Color Inactive = Colors.Transparent;
+    public Color YouCardStroke => IsYourTurn && !IsGameOver ? Active : Inactive;
+    public Color CpuCardStroke => !IsYourTurn && !IsGameOver ? Active : Inactive;
+
+    private bool CanRoll() => IsYourTurn && !IsGameOver && !Busy;
+    private bool CanPass() => IsYourTurn && !IsGameOver && !Busy && TurnScore > 0;
+
+    /// <summary>Begin a fresh game from the current settings. Call when the page appears.</summary>
+    public void Start()
+    {
+        _opponent = Strategies.ById(GameSettings.OpponentAi);
+        CpuName = Capitalise(_opponent.Name);
+
+        int start = GameSettings.HumanStarts ? HumanIndex : 1;
+        _game = new PigGame("You", CpuName, GameSettings.WinScore, _rng, start);
+
+        IsGameOver = false;
+        ResultText = string.Empty;
+        Pig1 = Pig2 = null;
+        Caption = "Tap Roll to start your turn.";
+        Sync();
+
+        if (!IsYourTurn)
+            _ = RunOpponentTurnAsync();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRoll))]
+    private async Task RollAsync()
+    {
+        PigRoll roll = _game.Roll();
+        ShowRoll("You", roll);
+        Sync();
+        if (!IsYourTurn && !IsGameOver)
+            await RunOpponentTurnAsync();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanPass))]
+    private async Task PassAsync()
+    {
+        _game.Pass();
+        Caption = "You hold.";
+        Sync();
+        if (!IsYourTurn && !IsGameOver)
+            await RunOpponentTurnAsync();
+    }
+
+    [RelayCommand]
+    private void PlayAgain() => Start();
+
+    private async Task RunOpponentTurnAsync()
+    {
+        Busy = true;
+        await Task.Delay(500);
+
+        while (!_game.IsOver && _game.ActiveIndex != HumanIndex)
+        {
+            RollDecision d = _opponent.Decide(_game.ActiveView, _rng);
+            if (d.Roll)
+            {
+                PigRoll roll = _game.Roll();
+                ShowRoll(CpuName, roll);
+                Sync();
+                await Task.Delay(OpponentPauseMs);
+            }
+            else
+            {
+                int banked = _game.Active.TurnScore;
+                _game.Pass();
+                Caption = $"{CpuName} holds on {banked}.";
+                Sync();
+                break;
+            }
+        }
+
+        Busy = false;
+        Sync();
+    }
+
+    private void ShowRoll(string who, PigRoll roll)
+    {
+        Pig1 = PigImages.For(roll.One, _rng);
+        Pig2 = PigImages.For(roll.Two, _rng);
+        Caption = roll.IsPigOut
+            ? $"{who}: {Nice(roll.One)} + {Nice(roll.Two)}  →  PIG OUT"
+            : $"{who}: {Nice(roll.One)} + {Nice(roll.Two)}  →  {roll.Score}";
+    }
+
+    private void Sync()
+    {
+        TurnNumber = _game.TurnNumber;
+        YouTotal = _game.Players[0].TotalScore;
+        CpuTotal = _game.Players[1].TotalScore;
+        IsYourTurn = _game.ActiveIndex == HumanIndex && !_game.IsOver;
+        TurnScore = _game.Active.TurnScore;
+
+        if (_game.IsOver && !IsGameOver)
+        {
+            IsGameOver = true;
+            ResultText = _game.WinnerIndex == HumanIndex ? "You win! 🎉" : $"{CpuName} wins.";
+        }
+    }
+
+    private static string Capitalise(string s) => s.Length == 0 ? s : char.ToUpper(s[0]) + s[1..];
+
+    private static string Nice(PigPosition p) => p switch
+    {
+        PigPosition.SideNoDot => "Sider",
+        PigPosition.SideDot => "Sider (dot)",
+        PigPosition.LeaningJowler => "Leaning Jowler",
+        _ => p.ToString()
+    };
+}

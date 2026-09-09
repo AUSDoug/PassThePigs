@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PassThePigs.App.ViewModels"
+             x:Class="PassThePigs.App.Pages.SetupPage"
+             x:DataType="vm:SetupViewModel"
+             Title="Pass the Pigs">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="28" Spacing="20" VerticalOptions="Center">
+
+            <Label Text="🐷 Pass the Pigs"
+                   FontSize="34" FontAttributes="Bold"
+                   HorizontalOptions="Center" />
+
+            <Label Text="Opponent" FontAttributes="Bold" Margin="0,12,0,0" />
+            <Picker ItemsSource="{Binding Opponents}"
+                    SelectedIndex="{Binding SelectedOpponentIndex}" />
+
+            <HorizontalStackLayout Spacing="12">
+                <Switch IsToggled="{Binding HumanStarts}" />
+                <Label Text="I take the first turn" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <Button Text="Play"
+                    Command="{Binding PlayCommand}"
+                    Margin="0,20,0,0"
+                    HeightRequest="52" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

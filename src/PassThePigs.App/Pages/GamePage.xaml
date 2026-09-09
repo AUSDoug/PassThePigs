@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PassThePigs.App.ViewModels"
+             x:Class="PassThePigs.App.Pages.GamePage"
+             x:DataType="vm:GameViewModel"
+             Title="Pass the Pigs">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto" Padding="16" RowSpacing="14">
+
+        <Label Grid.Row="0"
+               Text="{Binding TurnNumber, StringFormat='Turn {0}'}"
+               FontSize="18" HorizontalOptions="Center" />
+
+        <!-- Scoreboard -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="12">
+            <Border Grid.Column="0" Padding="12" StrokeShape="RoundRectangle 12"
+                    StrokeThickness="2" Stroke="{Binding YouCardStroke}"
+                    BackgroundColor="{AppThemeBinding Light=#FDE7EC, Dark=#3A2A30}">
+                <VerticalStackLayout HorizontalOptions="Center">
+                    <Label Text="You" />
+                    <Label Text="{Binding YouTotal}" FontSize="30" HorizontalOptions="Center" />
+                    <Label Text="{Binding YouTurnLabel}" TextColor="#C2557A" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Border>
+            <Border Grid.Column="1" Padding="12" StrokeShape="RoundRectangle 12"
+                    StrokeThickness="2" Stroke="{Binding CpuCardStroke}"
+                    BackgroundColor="{AppThemeBinding Light=#FDE7EC, Dark=#3A2A30}">
+                <VerticalStackLayout HorizontalOptions="Center">
+                    <Label Text="{Binding CpuName}" />
+                    <Label Text="{Binding CpuTotal}" FontSize="30" HorizontalOptions="Center" />
+                    <Label Text="{Binding CpuTurnLabel}" TextColor="#C2557A" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- Pigs -->
+        <VerticalStackLayout Grid.Row="2" VerticalOptions="Center" Spacing="10">
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="6">
+                <Image Source="{Binding Pig1}" WidthRequest="150" HeightRequest="150" Aspect="AspectFit" />
+                <Image Source="{Binding Pig2}" WidthRequest="150" HeightRequest="150" Aspect="AspectFit" />
+            </HorizontalStackLayout>
+            <Label Text="{Binding Caption}" HorizontalOptions="Center" HorizontalTextAlignment="Center" />
+        </VerticalStackLayout>
+
+        <!-- Controls -->
+        <HorizontalStackLayout Grid.Row="3" HorizontalOptions="Center" Spacing="16">
+            <Button Text="Roll" Command="{Binding RollCommand}" WidthRequest="130" HeightRequest="50" />
+            <Button Text="Pass" Command="{Binding PassCommand}" WidthRequest="130" HeightRequest="50" />
+        </HorizontalStackLayout>
+
+        <Label Grid.Row="4" Text="" HeightRequest="4" />
+
+        <!-- Game over overlay -->
+        <VerticalStackLayout Grid.RowSpan="5" IsVisible="{Binding IsGameOver}"
+                             BackgroundColor="{AppThemeBinding Light=#EEFFFFFF, Dark=#EE000000}"
+                             VerticalOptions="Fill" HorizontalOptions="Fill"
+                             Padding="24" Spacing="18">
+            <Label Text="{Binding ResultText}" FontSize="28" FontAttributes="Bold"
+                   HorizontalOptions="Center" VerticalOptions="EndAndExpand" />
+            <Button Text="Play again" Command="{Binding PlayAgainCommand}"
+                    HorizontalOptions="Center" VerticalOptions="StartAndExpand" />
+        </VerticalStackLayout>
+
+    </Grid>
+</ContentPage>
