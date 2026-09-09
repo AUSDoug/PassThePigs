@@ -20,9 +20,17 @@ public partial class GameViewModel : ObservableObject
     [ObservableProperty] private int _youTotal;
     [ObservableProperty] private int _cpuTotal;
     [ObservableProperty] private string _caption = "";
-    [ObservableProperty] private string? _pig1;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowPigs), nameof(ShowHint))]
+    private string? _pig1;
+
     [ObservableProperty] private string? _pig2;
     [ObservableProperty] private string _resultText = "";
+
+    /// <summary>A roll has happened this game, so there are pigs to show.</summary>
+    public bool ShowPigs => Pig1 is not null;
+    public bool ShowHint => Pig1 is null;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(YouTurnLabel), nameof(CpuTurnLabel), nameof(YouCardStroke), nameof(CpuCardStroke))]

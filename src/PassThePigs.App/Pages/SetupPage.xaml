@@ -7,25 +7,35 @@
              Title="Pass the Pigs">
 
     <ScrollView>
-        <VerticalStackLayout Padding="28" Spacing="20" VerticalOptions="Center">
+        <VerticalStackLayout Padding="28" Spacing="18" VerticalOptions="Center">
 
-            <Label Text="🐷 Pass the Pigs"
+            <Label Text="🐷" FontSize="72" HorizontalOptions="Center" />
+            <Label Text="Pass the Pigs"
                    FontSize="34" FontAttributes="Bold"
-                   HorizontalOptions="Center" />
+                   TextColor="{StaticResource Primary}"
+                   HorizontalOptions="Center" Margin="0,0,0,16" />
 
-            <Label Text="Opponent" FontAttributes="Bold" Margin="0,12,0,0" />
-            <Picker ItemsSource="{Binding Opponents}"
-                    SelectedIndex="{Binding SelectedOpponentIndex}" />
+            <Label Text="OPPONENT" FontSize="12" FontAttributes="Bold"
+                   TextColor="{StaticResource Gray500}" />
+            <Border Stroke="{StaticResource Secondary}" StrokeThickness="1"
+                    StrokeShape="RoundRectangle 10" Padding="6,0"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource Stage}, Dark={StaticResource StageDark}}">
+                <Picker ItemsSource="{Binding Opponents}"
+                        SelectedItem="{Binding SelectedOpponent}"
+                        Title="Choose an opponent" />
+            </Border>
 
-            <HorizontalStackLayout Spacing="12">
-                <Switch IsToggled="{Binding HumanStarts}" />
-                <Label Text="I take the first turn" VerticalOptions="Center" />
-            </HorizontalStackLayout>
+            <Grid ColumnDefinitions="Auto,*" Margin="0,8,0,0">
+                <Switch Grid.Column="0" IsToggled="{Binding HumanStarts}"
+                        OnColor="{StaticResource Primary}" />
+                <Label Grid.Column="1" Text="I take the first turn"
+                       VerticalOptions="Center" Margin="12,0,0,0" />
+            </Grid>
 
             <Button Text="Play"
                     Command="{Binding PlayCommand}"
-                    Margin="0,20,0,0"
-                    HeightRequest="52" />
+                    Margin="0,24,0,0"
+                    HeightRequest="56" FontSize="18" FontAttributes="Bold" />
 
         </VerticalStackLayout>
     </ScrollView>

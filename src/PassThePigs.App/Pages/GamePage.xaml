@@ -6,61 +6,80 @@
              x:DataType="vm:GameViewModel"
              Title="Pass the Pigs">
 
-    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto" Padding="16" RowSpacing="14">
+    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto" Padding="16,10,16,16" RowSpacing="12">
 
         <Label Grid.Row="0"
                Text="{Binding TurnNumber, StringFormat='Turn {0}'}"
-               FontSize="18" HorizontalOptions="Center" />
+               FontSize="15" TextColor="{StaticResource Gray500}"
+               HorizontalOptions="Center" />
 
         <!-- Scoreboard -->
         <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="12">
-            <Border Grid.Column="0" Padding="12" StrokeShape="RoundRectangle 12"
-                    StrokeThickness="2" Stroke="{Binding YouCardStroke}"
-                    BackgroundColor="{AppThemeBinding Light=#FDE7EC, Dark=#3A2A30}">
-                <VerticalStackLayout HorizontalOptions="Center">
-                    <Label Text="You" />
-                    <Label Text="{Binding YouTotal}" FontSize="30" HorizontalOptions="Center" />
-                    <Label Text="{Binding YouTurnLabel}" TextColor="#C2557A" HorizontalOptions="Center" />
+            <Border Grid.Column="0" Padding="14,10" StrokeThickness="2.5"
+                    Stroke="{Binding YouCardStroke}" StrokeShape="RoundRectangle 14"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource StageDark}}">
+                <VerticalStackLayout HorizontalOptions="Center" Spacing="0">
+                    <Label Text="You" FontSize="13" TextColor="{StaticResource Gray600}" HorizontalOptions="Center" />
+                    <Label Text="{Binding YouTotal}" FontSize="34" FontAttributes="Bold" HorizontalOptions="Center" />
+                    <Label Text="{Binding YouTurnLabel}" FontSize="14" HeightRequest="20"
+                           TextColor="{StaticResource TurnAccent}" HorizontalOptions="Center" />
                 </VerticalStackLayout>
             </Border>
-            <Border Grid.Column="1" Padding="12" StrokeShape="RoundRectangle 12"
-                    StrokeThickness="2" Stroke="{Binding CpuCardStroke}"
-                    BackgroundColor="{AppThemeBinding Light=#FDE7EC, Dark=#3A2A30}">
-                <VerticalStackLayout HorizontalOptions="Center">
-                    <Label Text="{Binding CpuName}" />
-                    <Label Text="{Binding CpuTotal}" FontSize="30" HorizontalOptions="Center" />
-                    <Label Text="{Binding CpuTurnLabel}" TextColor="#C2557A" HorizontalOptions="Center" />
+            <Border Grid.Column="1" Padding="14,10" StrokeThickness="2.5"
+                    Stroke="{Binding CpuCardStroke}" StrokeShape="RoundRectangle 14"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource StageDark}}">
+                <VerticalStackLayout HorizontalOptions="Center" Spacing="0">
+                    <Label Text="{Binding CpuName}" FontSize="13" TextColor="{StaticResource Gray600}" HorizontalOptions="Center" />
+                    <Label Text="{Binding CpuTotal}" FontSize="34" FontAttributes="Bold" HorizontalOptions="Center" />
+                    <Label Text="{Binding CpuTurnLabel}" FontSize="14" HeightRequest="20"
+                           TextColor="{StaticResource TurnAccent}" HorizontalOptions="Center" />
                 </VerticalStackLayout>
             </Border>
         </Grid>
 
-        <!-- Pigs -->
-        <VerticalStackLayout Grid.Row="2" VerticalOptions="Center" Spacing="10">
-            <HorizontalStackLayout HorizontalOptions="Center" Spacing="6">
-                <Image Source="{Binding Pig1}" WidthRequest="150" HeightRequest="150" Aspect="AspectFit" />
-                <Image Source="{Binding Pig2}" WidthRequest="150" HeightRequest="150" Aspect="AspectFit" />
-            </HorizontalStackLayout>
-            <Label Text="{Binding Caption}" HorizontalOptions="Center" HorizontalTextAlignment="Center" />
-        </VerticalStackLayout>
+        <!-- Pig stage: fills the remaining space. Swipe up to roll.
+             This is where the 3D pigs will live. -->
+        <Border Grid.Row="2" StrokeThickness="1" Stroke="{StaticResource Secondary}"
+                StrokeShape="RoundRectangle 20"
+                BackgroundColor="{AppThemeBinding Light={StaticResource Stage}, Dark={StaticResource StageDark}}">
+            <Border.GestureRecognizers>
+                <SwipeGestureRecognizer Direction="Up" Command="{Binding RollCommand}" />
+            </Border.GestureRecognizers>
+            <Grid Padding="12">
+                <Label Text="Swipe up, or tap Roll"
+                       IsVisible="{Binding ShowHint}"
+                       HorizontalOptions="Center" VerticalOptions="Center"
+                       TextColor="{StaticResource Gray400}" FontSize="16" />
+                <Grid ColumnDefinitions="*,*" IsVisible="{Binding ShowPigs}">
+                    <Image Grid.Column="0" Source="{Binding Pig1}" Aspect="AspectFit" Margin="6" />
+                    <Image Grid.Column="1" Source="{Binding Pig2}" Aspect="AspectFit" Margin="6" />
+                </Grid>
+            </Grid>
+        </Border>
+
+        <Label Grid.Row="3" Text="{Binding Caption}"
+               HorizontalOptions="Center" HorizontalTextAlignment="Center"
+               FontSize="15" Margin="0,2" MinimumHeightRequest="22" />
 
         <!-- Controls -->
-        <HorizontalStackLayout Grid.Row="3" HorizontalOptions="Center" Spacing="16">
-            <Button Text="Roll" Command="{Binding RollCommand}" WidthRequest="130" HeightRequest="50" />
-            <Button Text="Pass" Command="{Binding PassCommand}" WidthRequest="130" HeightRequest="50" />
-        </HorizontalStackLayout>
+        <Grid Grid.Row="4" ColumnDefinitions="*,*" ColumnSpacing="14">
+            <Button Grid.Column="0" Text="Roll" Command="{Binding RollCommand}"
+                    HeightRequest="56" FontSize="17" FontAttributes="Bold" />
+            <Button Grid.Column="1" Text="Pass" Command="{Binding PassCommand}"
+                    HeightRequest="56" FontSize="17" FontAttributes="Bold" />
+        </Grid>
 
-        <Label Grid.Row="4" Text="" HeightRequest="4" />
-
-        <!-- Game over overlay -->
-        <VerticalStackLayout Grid.RowSpan="5" IsVisible="{Binding IsGameOver}"
-                             BackgroundColor="{AppThemeBinding Light=#EEFFFFFF, Dark=#EE000000}"
-                             VerticalOptions="Fill" HorizontalOptions="Fill"
-                             Padding="24" Spacing="18">
-            <Label Text="{Binding ResultText}" FontSize="28" FontAttributes="Bold"
-                   HorizontalOptions="Center" VerticalOptions="EndAndExpand" />
-            <Button Text="Play again" Command="{Binding PlayAgainCommand}"
-                    HorizontalOptions="Center" VerticalOptions="StartAndExpand" />
-        </VerticalStackLayout>
+        <!-- Game over -->
+        <Grid Grid.RowSpan="5" IsVisible="{Binding IsGameOver}"
+              BackgroundColor="{AppThemeBinding Light=#F2FFFFFF, Dark=#F2000000}">
+            <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center"
+                                 Spacing="24" Padding="32">
+                <Label Text="{Binding ResultText}" FontSize="30" FontAttributes="Bold"
+                       HorizontalTextAlignment="Center" />
+                <Button Text="Play again" Command="{Binding PlayAgainCommand}"
+                        HeightRequest="52" WidthRequest="200" />
+            </VerticalStackLayout>
+        </Grid>
 
     </Grid>
 </ContentPage>
