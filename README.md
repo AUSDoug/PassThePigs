@@ -8,7 +8,19 @@ reshaped into an Android app.
 |---|---|
 | `src/PassThePigs.Core` | The game engine and AI — pure C#, no UI. Roll scoring, turn/score/win rules, and the five roll strategies. |
 | `src/PassThePigs.Console` | Headless companion: AI-vs-AI runs and the `bench` harness for tuning the AI. |
-| `src/PassThePigs.App` | *(coming)* .NET MAUI Android app — the playable GUI. |
+| `src/PassThePigs.App` | .NET MAUI app (`net9.0-android`) — the playable GUI. |
+
+## The Android app
+
+```
+dotnet build src/PassThePigs.App -f net9.0-android          # -> a signed APK under bin/
+```
+
+Or open `PassThePigs.sln` in Visual Studio 2022 and deploy to an emulator or
+device. **Setup** screen picks the opponent ruleset and who goes first (saved via
+MAUI `Preferences`); the **game** screen shows the turn, both scores, the two pigs
+from the last roll, and Roll / Pass. The opponent's turn plays out with a pause
+between rolls. Needs the `maui` / `android` workload and the Android SDK.
 
 ## AI rulesets
 
@@ -38,7 +50,7 @@ the console and `logs/`, with the AI's reasoning in `logs/ai-commentary-*.log`.
 ## Requirements
 
 - .NET 9 SDK (Core + Console)
-- .NET MAUI workload + Android SDK (App — once it lands)
+- .NET MAUI workload + Android SDK + JDK 17 (App)
 
 ## License
 
