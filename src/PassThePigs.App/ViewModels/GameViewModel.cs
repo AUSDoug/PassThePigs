@@ -18,7 +18,7 @@ public partial class GameViewModel : ObservableObject
     private string _cpuRealName = "";
 
     [ObservableProperty] private int _roundNumber;
-    [ObservableProperty] private int _targetScore;
+    [ObservableProperty] private string _targetLabel = "";
     [ObservableProperty] private string _cpuName = "CPU";
     [ObservableProperty] private int _youTotal;
     [ObservableProperty] private int _cpuTotal;
@@ -85,7 +85,9 @@ public partial class GameViewModel : ObservableObject
             _ => _rng.Next(2),
         };
         _game = new PigGame("You", _cpuRealName, GameSettings.WinScore, _rng, start, GameSettings.ExactWin);
-        TargetScore = _game.WinScore;
+        TargetLabel = _game.ExactWin
+            ? $"Target {_game.WinScore} — don't roll over!"
+            : $"First to {_game.WinScore}";
 
         IsGameOver = false;
         ResultText = string.Empty;
