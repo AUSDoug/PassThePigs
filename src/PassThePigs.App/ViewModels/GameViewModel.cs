@@ -14,12 +14,19 @@ public partial class GameViewModel : ObservableObject
     private PigGame _game = null!;
     private IRollStrategy _opponent = null!;
 
-    [ObservableProperty] private int _turnNumber;
+    // The opponent's real name; only shown once "Random" mode reaches game over.
+    private string _cpuRealName = "";
+
+    [ObservableProperty] private int _roundNumber;
+    [ObservableProperty] private int _targetScore;
     [ObservableProperty] private string _cpuName = "CPU";
     [ObservableProperty] private int _youTotal;
     [ObservableProperty] private int _cpuTotal;
     [ObservableProperty] private string _caption = "";
     [ObservableProperty] private string _resultText = "";
+
+    /// <summary>Raised when a fresh game starts, so the page can clear the last render.</summary>
+    public event Action? NewGame;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowHint))]
@@ -64,8 +71,12 @@ public partial class GameViewModel : ObservableObject
     /// <summary>Begin a fresh game from the current settings. Call when the page appears.</summary>
     public void Start()
     {
-        _opponent = Strategies.ById(GameSettings.OpponentAi, GameSettings.ExactWin);
-        CpuName = Capitalise(_opponent.Name);
+        int aiId = GameSettings.RandomOpponent
+            ? _rng.Next(Strategies.Names.Length)
+            : GameSettings.OpponentAi;
+        _opponent = Strategies.ById(aiId, GameSettings.ExactWin);
+        _cpuRealName = Strategies.Names[aiId];
+        CpuName = GameSettings.RandomOpponent ? "Opponent" : _cpuRealName;
 
         int start = GameSettings.FirstTurn switch
         {
@@ -73,12 +84,14 @@ public partial class GameViewModel : ObservableObject
             FirstTurn.Ai => 1,
             _ => _rng.Next(2),
         };
-        _game = new PigGame("You", CpuName, GameSettings.WinScore, _rng, start, GameSettings.ExactWin);
+        _game = new PigGame("You", _cpuRealName, GameSettings.WinScore, _rng, start, GameSettings.ExactWin);
+        TargetScore = _game.WinScore;
 
         IsGameOver = false;
         ResultText = string.Empty;
         HasRolled = false;
         Caption = "Tap Roll to start your turn.";
+        NewGame?.Invoke();
         Sync();
 
         if (!IsYourTurn)
@@ -159,7 +172,7 @@ public partial class GameViewModel : ObservableObject
 
     private void Sync()
     {
-        TurnNumber = _game.TurnNumber;
+        RoundNumber = _game.RoundNumber;
         YouTotal = _game.Players[0].TotalScore;
         CpuTotal = _game.Players[1].TotalScore;
         IsYourTurn = _game.ActiveIndex == HumanIndex && !_game.IsOver;
@@ -168,11 +181,12 @@ public partial class GameViewModel : ObservableObject
         if (_game.IsOver && !IsGameOver)
         {
             IsGameOver = true;
-            ResultText = _game.WinnerIndex == HumanIndex ? "You win! 🎉" : $"{CpuName} wins.";
+            CpuName = _cpuRealName;   // reveal the "Random" opponent now the game's done
+            ResultText = _game.WinnerIndex == HumanIndex
+                ? $"You beat {_cpuRealName}! 🎉"
+                : $"{_cpuRealName} wins.";
         }
     }
-
-    private static string Capitalise(string s) => s.Length == 0 ? s : char.ToUpper(s[0]) + s[1..];
 
     private static string Nice(PigPosition p) => p switch
     {

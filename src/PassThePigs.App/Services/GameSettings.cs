@@ -11,6 +11,13 @@ public static class GameSettings
         set => Preferences.Set(nameof(OpponentAi), value);
     }
 
+    /// <summary>Hide the opponent picker and draw a random AI at the start of each game.</summary>
+    public static bool RandomOpponent
+    {
+        get => Preferences.Get(nameof(RandomOpponent), false);
+        set => Preferences.Set(nameof(RandomOpponent), value);
+    }
+
     public static int WinScore
     {
         get => Preferences.Get(nameof(WinScore), 100);

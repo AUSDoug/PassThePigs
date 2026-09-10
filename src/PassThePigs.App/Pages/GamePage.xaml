@@ -8,10 +8,14 @@
 
     <Grid RowDefinitions="Auto,Auto,*,Auto,Auto" Padding="16,10,16,16" RowSpacing="12">
 
-        <Label Grid.Row="0"
-               Text="{Binding TurnNumber, StringFormat='Turn {0}'}"
-               FontSize="15" TextColor="{StaticResource Gray500}"
-               HorizontalOptions="Center" />
+        <VerticalStackLayout Grid.Row="0" Spacing="1" HorizontalOptions="Center">
+            <Label Text="{Binding RoundNumber, StringFormat='Round {0}'}"
+                   FontSize="15" TextColor="{StaticResource Gray500}"
+                   HorizontalOptions="Center" />
+            <Label Text="{Binding TargetScore, StringFormat='First to {0}'}"
+                   FontSize="12" TextColor="{StaticResource Gray400}"
+                   HorizontalOptions="Center" />
+        </VerticalStackLayout>
 
         <!-- Scoreboard -->
         <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="12">

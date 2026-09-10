@@ -121,8 +121,19 @@ const anchors = SLOTS.map(([x, y, z]) => {
   return { anchor: a, pose: null };
 });
 
+// buildPig() makes fresh geometry every call, so a discarded pose leaks its
+// WebGL buffers until the renderer process is killed (fine on a software GL,
+// fatal on a phone GPU after a dozen-odd rolls). Free them here. The materials
+// in pig-model.js are shared module singletons - leave those alone.
+function disposePose(root) {
+  root.traverse((o) => { if (o.isMesh && o.geometry) o.geometry.dispose(); });
+}
+
 function setPose(slot, poseId, dot) {
-  if (slot.pose) slot.anchor.remove(slot.pose);
+  if (slot.pose) {
+    slot.anchor.remove(slot.pose);
+    disposePose(slot.pose);
+  }
   slot.pose = buildPose(poseId, { dot });
   slot.pose.rotation.y = (Math.random() - 0.5) * 0.8;  // matching poses aren't clones
   slot.pose.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
@@ -143,6 +154,13 @@ window.renderRoll = function renderRoll(pose1, dot1, pose2, dot2) {
 // One slice of the stashed base64 (base64 alphabet has no chars the bridge escapes).
 window.__b64Slice = function (start, len) {
   return (window.__b64 || '').substr(start, len);
+};
+
+// Live GPU-resource counts; should stay flat across rolls now that poses are
+// disposed. Handy from EvaluateJavaScriptAsync if the leak ever regresses.
+window.__pigMem = function () {
+  const m = renderer.info.memory;
+  return `geometries=${m.geometries} textures=${m.textures}`;
 };
 
 // flush anything MAUI queued before the module loaded

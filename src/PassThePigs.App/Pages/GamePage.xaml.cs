@@ -15,6 +15,7 @@ public partial class GamePage : ContentPage
         InitializeComponent();
         BindingContext = _vm = vm;
         _vm.RollShown += OnRollShown;
+        _vm.NewGame += () => PigImage.Source = null;   // don't carry the last game's render in
     }
 
     protected override void OnAppearing()

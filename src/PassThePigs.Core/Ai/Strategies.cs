@@ -9,8 +9,8 @@ public static class Strategies
     public const int Expert = 3;
     public const int Ev = 4;
 
-    /// <summary>Display names in id order (for drop-downs).</summary>
-    public static readonly string[] Names = { "Basic", "Random", "Aggressive", "Expert", "EV (stop at 23)" };
+    /// <summary>Display names in id order (for drop-downs). Index matches the id constants above.</summary>
+    public static readonly string[] Names = { "Basic", "Random Rolls", "Aggressive", "Expert", "Optimal" };
 
     public static IRollStrategy ById(int id, bool exactWin = false)
     {

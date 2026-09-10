@@ -14,11 +14,23 @@ public partial class SetupViewModel : ObservableObject
     // has a first-load race with ItemsSource that can select the wrong row.
     [ObservableProperty] private string _selectedOpponent = NameFor(GameSettings.OpponentAi);
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowOpponentPicker))]
+    private bool _randomOpponent = GameSettings.RandomOpponent;
+
+    /// <summary>The picker is hidden while "Random" is on - the opponent is a surprise.</summary>
+    public bool ShowOpponentPicker => !RandomOpponent;
+
+    partial void OnRandomOpponentChanged(bool value) => GameSettings.RandomOpponent = value;
+
     [RelayCommand]
     private async Task PlayAsync()
     {
-        int id = Math.Max(0, Array.IndexOf(Opponents, SelectedOpponent));
-        GameSettings.OpponentAi = id;
+        if (!RandomOpponent)
+        {
+            int id = Math.Max(0, Array.IndexOf(Opponents, SelectedOpponent));
+            GameSettings.OpponentAi = id;
+        }
         await Shell.Current.GoToAsync(nameof(GamePage));
     }
 

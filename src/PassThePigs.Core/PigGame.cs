@@ -29,6 +29,9 @@ public sealed class PigGame
     /// <summary>Turns taken so far (both players), 1-based for the current turn.</summary>
     public int TurnNumber { get; private set; } = 1;
 
+    /// <summary>Rounds played, 1-based: bumps only once every player has had a turn.</summary>
+    public int RoundNumber => (TurnNumber - 1) / _players.Length + 1;
+
     public bool IsOver { get; private set; }
     public int WinnerIndex { get; private set; } = -1;
     public PlayerState? Winner => WinnerIndex < 0 ? null : _players[WinnerIndex];

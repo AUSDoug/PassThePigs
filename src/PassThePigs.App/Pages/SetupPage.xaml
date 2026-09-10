@@ -20,11 +20,18 @@
                    TextColor="{StaticResource Gray500}" />
             <Border Stroke="{StaticResource Secondary}" StrokeThickness="1"
                     StrokeShape="RoundRectangle 10" Padding="6,0"
+                    IsVisible="{Binding ShowOpponentPicker}"
                     BackgroundColor="{AppThemeBinding Light={StaticResource Stage}, Dark={StaticResource StageDark}}">
                 <Picker ItemsSource="{Binding Opponents}"
                         SelectedItem="{Binding SelectedOpponent}"
                         Title="Choose an opponent" />
             </Border>
+
+            <Grid ColumnDefinitions="Auto,*">
+                <Switch Grid.Column="0" IsToggled="{Binding RandomOpponent}" />
+                <Label Grid.Column="1" VerticalOptions="Center" Margin="12,0,0,0"
+                       Text="Random — a mystery opponent, drawn each game" />
+            </Grid>
 
             <Button Text="Play"
                     Command="{Binding PlayCommand}"
