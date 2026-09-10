@@ -37,23 +37,30 @@
             </Border>
         </Grid>
 
-        <!-- Pig stage: fills the remaining space. Swipe up to roll.
-             This is where the 3D pigs will live. -->
+        <!-- Pig stage: a MAUI Image showing the 3D render. The HybridWebView is an
+             offscreen three.js renderer (1x1, hidden) - it doesn't composite on
+             screen reliably on Android, so we read PNGs from its canvas instead. -->
         <Border Grid.Row="2" StrokeThickness="1" Stroke="{StaticResource Secondary}"
                 StrokeShape="RoundRectangle 20"
                 BackgroundColor="{AppThemeBinding Light={StaticResource Stage}, Dark={StaticResource StageDark}}">
-            <Border.GestureRecognizers>
-                <SwipeGestureRecognizer Direction="Up" Command="{Binding RollCommand}" />
-            </Border.GestureRecognizers>
-            <Grid Padding="12">
+            <Grid>
+                <Image x:Name="PigImage" Aspect="AspectFit" Margin="10" />
+                <!-- Offscreen render engine: parked far outside the visible area so it
+                     never paints over the stage (it won't composite reliably here). -->
+                <HybridWebView x:Name="PigView" HybridRoot="wwwroot" DefaultFile="index.html"
+                               WidthRequest="2" HeightRequest="2"
+                               HorizontalOptions="Start" VerticalOptions="Start"
+                               TranslationX="-5000" TranslationY="-5000"
+                               InputTransparent="True" />
+                <BoxView Color="Transparent" BackgroundColor="Transparent">
+                    <BoxView.GestureRecognizers>
+                        <SwipeGestureRecognizer Direction="Up" Command="{Binding RollCommand}" />
+                    </BoxView.GestureRecognizers>
+                </BoxView>
                 <Label Text="Swipe up, or tap Roll"
-                       IsVisible="{Binding ShowHint}"
-                       HorizontalOptions="Center" VerticalOptions="Center"
-                       TextColor="{StaticResource Gray400}" FontSize="16" />
-                <Grid ColumnDefinitions="*,*" IsVisible="{Binding ShowPigs}">
-                    <Image Grid.Column="0" Source="{Binding Pig1}" Aspect="AspectFit" Margin="6" />
-                    <Image Grid.Column="1" Source="{Binding Pig2}" Aspect="AspectFit" Margin="6" />
-                </Grid>
+                       IsVisible="{Binding ShowHint}" InputTransparent="True"
+                       HorizontalOptions="Center" VerticalOptions="End" Margin="0,0,0,16"
+                       TextColor="{StaticResource Gray400}" FontSize="15" />
             </Grid>
         </Border>
 

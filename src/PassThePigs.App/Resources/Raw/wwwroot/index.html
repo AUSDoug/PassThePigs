@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Pigs</title>
+<script type="importmap">
+{ "imports": { "three": "./three.module.min.js" } }
+</script>
+<style>
+  /* This WebView is an offscreen renderer, never shown; MAUI reads canvas PNGs. */
+  html, body { margin: 0; overflow: hidden; background: transparent; }
+  #c { display: block; }
+</style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <script>
+    // Queue renderRoll calls that arrive before the 3D module finishes loading.
+    window.__pigQueue = [];
+    window.renderRoll = function () { window.__pigQueue.push([].slice.call(arguments)); return 0; };
+  </script>
+  <script type="module" src="./pigstage.js"></script>
+</body>
+</html>

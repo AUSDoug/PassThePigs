@@ -20,17 +20,17 @@ public partial class GameViewModel : ObservableObject
     [ObservableProperty] private int _youTotal;
     [ObservableProperty] private int _cpuTotal;
     [ObservableProperty] private string _caption = "";
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ShowPigs), nameof(ShowHint))]
-    private string? _pig1;
-
-    [ObservableProperty] private string? _pig2;
     [ObservableProperty] private string _resultText = "";
 
-    /// <summary>A roll has happened this game, so there are pigs to show.</summary>
-    public bool ShowPigs => Pig1 is not null;
-    public bool ShowHint => Pig1 is null;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowHint))]
+    private bool _hasRolled;
+
+    /// <summary>Show the "swipe / tap to roll" hint until the first roll of the game.</summary>
+    public bool ShowHint => !HasRolled;
+
+    /// <summary>Raised for each roll so the page can play it in the 3D stage.</summary>
+    public event Action<PigRoll>? RollShown;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(YouTurnLabel), nameof(CpuTurnLabel), nameof(YouCardStroke), nameof(CpuCardStroke))]
@@ -73,7 +73,7 @@ public partial class GameViewModel : ObservableObject
 
         IsGameOver = false;
         ResultText = string.Empty;
-        Pig1 = Pig2 = null;
+        HasRolled = false;
         Caption = "Tap Roll to start your turn.";
         Sync();
 
@@ -135,8 +135,8 @@ public partial class GameViewModel : ObservableObject
 
     private void ShowRoll(string who, PigRoll roll)
     {
-        Pig1 = PigImages.For(roll.One, _rng);
-        Pig2 = PigImages.For(roll.Two, _rng);
+        HasRolled = true;
+        RollShown?.Invoke(roll);
         Caption = roll.IsPigOut
             ? $"{who}: {Nice(roll.One)} + {Nice(roll.Two)}  →  PIG OUT"
             : $"{who}: {Nice(roll.One)} + {Nice(roll.Two)}  →  {roll.Score}";
