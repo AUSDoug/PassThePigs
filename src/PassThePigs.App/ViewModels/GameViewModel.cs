@@ -9,7 +9,6 @@ namespace PassThePigs.App.ViewModels;
 public partial class GameViewModel : ObservableObject
 {
     private const int HumanIndex = 0;
-    private const int OpponentPauseMs = 700;   // between the opponent's rolls, so you can watch
 
     private readonly Random _rng = new();
     private PigGame _game = null!;
@@ -65,11 +64,16 @@ public partial class GameViewModel : ObservableObject
     /// <summary>Begin a fresh game from the current settings. Call when the page appears.</summary>
     public void Start()
     {
-        _opponent = Strategies.ById(GameSettings.OpponentAi);
+        _opponent = Strategies.ById(GameSettings.OpponentAi, GameSettings.ExactWin);
         CpuName = Capitalise(_opponent.Name);
 
-        int start = GameSettings.HumanStarts ? HumanIndex : 1;
-        _game = new PigGame("You", CpuName, GameSettings.WinScore, _rng, start);
+        int start = GameSettings.FirstTurn switch
+        {
+            FirstTurn.Human => HumanIndex,
+            FirstTurn.Ai => 1,
+            _ => _rng.Next(2),
+        };
+        _game = new PigGame("You", CpuName, GameSettings.WinScore, _rng, start, GameSettings.ExactWin);
 
         IsGameOver = false;
         ResultText = string.Empty;
@@ -86,6 +90,9 @@ public partial class GameViewModel : ObservableObject
     {
         PigRoll roll = _game.Roll();
         ShowRoll("You", roll);
+        if (_game.ExactWin && !_game.IsOver && _game.ActiveIndex == HumanIndex
+            && _game.Active.ProjectedTotal > _game.WinScore)
+            Caption += $"  (over {_game.WinScore} - pass to try again next turn)";
         Sync();
         if (!IsYourTurn && !IsGameOver)
             await RunOpponentTurnAsync();
@@ -94,8 +101,11 @@ public partial class GameViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanPass))]
     private async Task PassAsync()
     {
+        int projected = _game.Active.ProjectedTotal;
         _game.Pass();
-        Caption = "You hold.";
+        Caption = _game.ExactWin && projected > _game.WinScore && !_game.IsOver
+            ? $"Over {_game.WinScore} - you lose the turn."
+            : "You hold.";
         Sync();
         if (!IsYourTurn && !IsGameOver)
             await RunOpponentTurnAsync();
@@ -107,7 +117,9 @@ public partial class GameViewModel : ObservableObject
     private async Task RunOpponentTurnAsync()
     {
         Busy = true;
-        await Task.Delay(500);
+        int delay = GameSettings.AiRollDelayMs;
+        bool animate = delay > 0;   // 0 = play the whole turn instantly, no 3D render
+        await Task.Delay(animate ? 500 : 0);
 
         while (!_game.IsOver && _game.ActiveIndex != HumanIndex)
         {
@@ -115,15 +127,18 @@ public partial class GameViewModel : ObservableObject
             if (d.Roll)
             {
                 PigRoll roll = _game.Roll();
-                ShowRoll(CpuName, roll);
+                ShowRoll(CpuName, roll, animate);
                 Sync();
-                await Task.Delay(OpponentPauseMs);
+                if (animate) await Task.Delay(delay);
             }
             else
             {
                 int banked = _game.Active.TurnScore;
+                int projected = _game.Active.ProjectedTotal;
                 _game.Pass();
-                Caption = $"{CpuName} holds on {banked}.";
+                Caption = _game.ExactWin && projected > _game.WinScore && !_game.IsOver
+                    ? $"{CpuName} overshot {_game.WinScore}."
+                    : $"{CpuName} holds on {banked}.";
                 Sync();
                 break;
             }
@@ -133,10 +148,10 @@ public partial class GameViewModel : ObservableObject
         Sync();
     }
 
-    private void ShowRoll(string who, PigRoll roll)
+    private void ShowRoll(string who, PigRoll roll, bool render = true)
     {
         HasRolled = true;
-        RollShown?.Invoke(roll);
+        if (render) RollShown?.Invoke(roll);
         Caption = roll.IsPigOut
             ? $"{who}: {Nice(roll.One)} + {Nice(roll.Two)}  →  PIG OUT"
             : $"{who}: {Nice(roll.One)} + {Nice(roll.Two)}  →  {roll.Score}";

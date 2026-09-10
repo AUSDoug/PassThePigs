@@ -21,6 +21,8 @@ public static class MauiProgram
         builder.Services.AddTransient<SetupPage>();
         builder.Services.AddTransient<GameViewModel>();
         builder.Services.AddTransient<GamePage>();
+        builder.Services.AddTransient<SettingsViewModel>();
+        builder.Services.AddTransient<SettingsPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();

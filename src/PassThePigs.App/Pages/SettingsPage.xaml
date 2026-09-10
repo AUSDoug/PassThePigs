@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PassThePigs.App.ViewModels"
+             x:Class="PassThePigs.App.Pages.SettingsPage"
+             x:DataType="vm:SettingsViewModel"
+             Title="Settings">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="28" Spacing="12">
+
+            <Label Text="APPEARANCE" FontSize="12" FontAttributes="Bold"
+                   TextColor="{StaticResource Gray500}" Margin="0,8,0,0" />
+            <Border Stroke="{StaticResource Secondary}" StrokeThickness="1"
+                    StrokeShape="RoundRectangle 10" Padding="6,0"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource Stage}, Dark={StaticResource StageDark}}">
+                <Picker ItemsSource="{Binding Themes}"
+                        SelectedItem="{Binding SelectedTheme}"
+                        Title="Theme" />
+            </Border>
+            <Label Text="&quot;System&quot; follows your phone's light / dark setting."
+                   FontSize="12" TextColor="{StaticResource Gray500}" />
+
+            <Label Text="GAME" FontSize="12" FontAttributes="Bold"
+                   TextColor="{StaticResource Gray500}" Margin="0,18,0,0" />
+
+            <Border Stroke="{StaticResource Secondary}" StrokeThickness="1"
+                    StrokeShape="RoundRectangle 10" Padding="6,0"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource Stage}, Dark={StaticResource StageDark}}">
+                <Picker ItemsSource="{Binding TargetScores}"
+                        SelectedItem="{Binding SelectedTargetScore}"
+                        Title="Target score" />
+            </Border>
+            <Label Text="First player to reach this score wins. The standard game is 100."
+                   FontSize="12" TextColor="{StaticResource Gray500}" />
+
+            <Grid ColumnDefinitions="*,Auto" Margin="0,6,0,0">
+                <Label Grid.Column="0" Text="Must hit the target exactly"
+                       VerticalOptions="Center" />
+                <Switch Grid.Column="1" IsToggled="{Binding ExactWin}" />
+            </Grid>
+            <Label Text="A turn that would bank past the target is forfeited."
+                   FontSize="12" TextColor="{StaticResource Gray500}" />
+
+            <Border Stroke="{StaticResource Secondary}" StrokeThickness="1"
+                    StrokeShape="RoundRectangle 10" Padding="6,0" Margin="0,6,0,0"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource Stage}, Dark={StaticResource StageDark}}">
+                <Picker ItemsSource="{Binding FirstTurnOptions}"
+                        SelectedItem="{Binding SelectedFirstTurn}"
+                        Title="First turn" />
+            </Border>
+            <Label Text="Who takes the opening turn of a new game."
+                   FontSize="12" TextColor="{StaticResource Gray500}" />
+
+            <Label Text="OPPONENT" FontSize="12" FontAttributes="Bold"
+                   TextColor="{StaticResource Gray500}" Margin="0,18,0,0" />
+            <Slider Minimum="0" Maximum="1000" Value="{Binding AiRollDelay}" />
+            <Label Text="{Binding AiDelayLabel}"
+                   FontSize="12" TextColor="{StaticResource Gray500}" />
+
+            <Button Text="Done" Command="{Binding DoneCommand}"
+                    Margin="0,28,0,0" HeightRequest="52"
+                    FontSize="17" FontAttributes="Bold" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

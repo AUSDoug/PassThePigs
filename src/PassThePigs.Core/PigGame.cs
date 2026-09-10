@@ -7,7 +7,8 @@ namespace PassThePigs.Core;
 ///
 /// Turn semantics match the original console game: the win is only decided when a
 /// turn ends (a voluntary pass or a pig out), so a greedy player can roll past the
-/// target and still bust.
+/// target and still bust. With <see cref="ExactWin"/> the target must be hit
+/// exactly - a turn whose banked total would land above it is forfeited.
 /// </summary>
 public sealed class PigGame
 {
@@ -15,6 +16,9 @@ public sealed class PigGame
     private readonly PlayerState[] _players;
 
     public int WinScore { get; }
+
+    /// <summary>When true, a turn that would bank past <see cref="WinScore"/> is forfeited.</summary>
+    public bool ExactWin { get; }
     public IReadOnlyList<PlayerState> Players => _players;
 
     /// <summary>Index (0 or 1) of the player whose turn it is.</summary>
@@ -35,14 +39,16 @@ public sealed class PigGame
     public event Action<PlayerState, PigRoll>? Rolled;
     public event Action<PlayerState>? PiggedOut;
     public event Action<PlayerState>? Passed;
+    public event Action<PlayerState>? Overshot;      // ended a turn past the exact target
     public event Action<PlayerState>? TurnStarted;   // the new active player
     public event Action<PlayerState>? GameWon;
 
     public PigGame(string player1Name, string player2Name, int winScore = 100,
-        Random? rng = null, int startingPlayer = 0)
+        Random? rng = null, int startingPlayer = 0, bool exactWin = false)
     {
         _players = [new PlayerState(player1Name), new PlayerState(player2Name)];
         WinScore = winScore;
+        ExactWin = exactWin;
         _rng = rng ?? new Random();
         ActiveIndex = startingPlayer & 1;
     }
@@ -113,15 +119,26 @@ public sealed class PigGame
     private void EndTurn()
     {
         PlayerState p = Active;
-        p.TotalScore += p.TurnScore;
-        p.TurnScore = 0;
+        int projected = p.TotalScore + p.TurnScore;
 
-        if (p.TotalScore >= WinScore)
+        if (ExactWin && projected > WinScore)
         {
-            IsOver = true;
-            WinnerIndex = ActiveIndex;
-            GameWon?.Invoke(p);
-            return;
+            // Overshot the exact target - the whole turn is forfeit.
+            p.TurnScore = 0;
+            Overshot?.Invoke(p);
+        }
+        else
+        {
+            p.TotalScore = projected;
+            p.TurnScore = 0;
+
+            if (p.TotalScore >= WinScore)
+            {
+                IsOver = true;
+                WinnerIndex = ActiveIndex;
+                GameWon?.Invoke(p);
+                return;
+            }
         }
 
         ActiveIndex ^= 1;

@@ -17,9 +17,42 @@ public static class GameSettings
         set => Preferences.Set(nameof(WinScore), value);
     }
 
-    public static bool HumanStarts
+    /// <summary>Who opens a new game.</summary>
+    public static FirstTurn FirstTurn
     {
-        get => Preferences.Get(nameof(HumanStarts), true);
-        set => Preferences.Set(nameof(HumanStarts), value);
+        get => (FirstTurn)Preferences.Get(nameof(FirstTurn), (int)Services.FirstTurn.Random);
+        set => Preferences.Set(nameof(FirstTurn), (int)value);
+    }
+
+    /// <summary>Require the target score to be hit exactly (an overshooting turn is forfeited).</summary>
+    public static bool ExactWin
+    {
+        get => Preferences.Get(nameof(ExactWin), false);
+        set => Preferences.Set(nameof(ExactWin), value);
+    }
+
+    public const int DefaultAiRollDelayMs = 700;
+
+    /// <summary>Pause between the opponent's rolls, in ms. 0 also skips the 3D render on its turn.</summary>
+    public static int AiRollDelayMs
+    {
+        get => Preferences.Get(nameof(AiRollDelayMs), DefaultAiRollDelayMs);
+        set => Preferences.Set(nameof(AiRollDelayMs), value);
+    }
+
+    /// <summary>
+    /// UI theme override. <see cref="AppTheme.Unspecified"/> means "follow the phone".
+    /// </summary>
+    public static AppTheme Theme
+    {
+        get => (AppTheme)Preferences.Get(nameof(Theme), (int)AppTheme.Unspecified);
+        set => Preferences.Set(nameof(Theme), (int)value);
+    }
+
+    /// <summary>Push the saved <see cref="Theme"/> onto the running app.</summary>
+    public static void ApplyTheme()
+    {
+        if (Application.Current is { } app)
+            app.UserAppTheme = Theme;
     }
 }

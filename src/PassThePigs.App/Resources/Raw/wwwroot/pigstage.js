@@ -10,7 +10,7 @@
 import * as THREE from 'three';
 import { buildPose } from './pig-model.js';
 
-const W = 900, H = 760;
+const W = 900, H = 810;   // ~matches the on-screen stage box, so the render fills it
 
 const canvas = document.getElementById('c');
 canvas.width = W;
@@ -51,21 +51,72 @@ ground.rotation.x = -Math.PI / 2;
 ground.receiveShadow = true;
 scene.add(ground);
 
-// Camera: fixed frame around the two-slot volume.
-{
-  const center = new THREE.Vector3(0, 0.012, 0);
-  const radius = 0.033;
-  const dist = (radius / Math.tan((camera.fov * Math.PI) / 360)) * 1.12;
-  const dir = new THREE.Vector3(0.7, 0.5, 1.4).normalize();
-  camera.position.copy(center).addScaledVector(dir, dist);
-  camera.lookAt(center);
+// Fixed 3/4 view direction; distance is fitted to the pigs each render.
+const VIEW_DIR = new THREE.Vector3(0.5, 0.42, 1.4).normalize();
+const FILL = 0.9;          // how far the pigs reach toward the tighter frame edge
+
+const _v = new THREE.Vector3();
+
+// World-space vertices of both pigs, so the fit hugs the real silhouette
+// (an axis-aligned box would leave slack from its empty corners).
+function pigPoints() {
+  const pts = [];
+  for (const s of anchors) {
+    if (!s.pose) continue;
+    s.pose.traverse((o) => {
+      if (!o.isMesh || !o.geometry?.attributes?.position) return;
+      const pos = o.geometry.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        pts.push(_v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld).clone());
+      }
+    });
+  }
+  return pts;
+}
+
+function frameCamera() {
+  scene.updateMatrixWorld(true);
+  const pts = pigPoints();
+  if (!pts.length) return;
+
+  const box = new THREE.Box3().setFromPoints(pts);
+  const c = box.getCenter(new THREE.Vector3());
+  // Aim a little below centre: a pig's visual mass sits above its box centre
+  // (round body on top, thin legs below), so this reads as vertically centred.
+  c.y -= (box.max.y - box.min.y) * 0.06;
+  const r = box.getBoundingSphere(new THREE.Sphere()).radius;
+
+  let dist = r * 3;
+  camera.near = 0.001;
+  camera.far = r * 24;
+
+  for (let iter = 0; iter < 4; iter++) {
+    camera.position.copy(c).addScaledVector(VIEW_DIR, dist);
+    camera.lookAt(c);
+    camera.updateProjectionMatrix();
+
+    let ext = 0;
+    for (const p of pts) {
+      _v.copy(p).project(camera);
+      ext = Math.max(ext, Math.abs(_v.x), Math.abs(_v.y));
+    }
+    dist *= ext / FILL;
+  }
+
+  camera.near = Math.max(dist - r * 2, 0.001);
+  camera.far = dist + r * 4;
   camera.updateProjectionMatrix();
 }
 
-const GAP = 0.028;
-const anchors = [-1, 1].map((sx) => {
+// The two pigs land near each other, one slightly ahead of the other, so the
+// pair reads as a compact cluster rather than a wide row.
+const SLOTS = [
+  [-0.019, 0, 0.011],
+  [0.019, 0, -0.011],
+];
+const anchors = SLOTS.map(([x, y, z]) => {
   const a = new THREE.Group();
-  a.position.x = sx * GAP;
+  a.position.set(x, y, z);
   scene.add(a);
   return { anchor: a, pose: null };
 });
@@ -83,6 +134,7 @@ function setPose(slot, poseId, dot) {
 window.renderRoll = function renderRoll(pose1, dot1, pose2, dot2) {
   setPose(anchors[0], pose1, !!dot1);
   setPose(anchors[1], pose2, !!dot2);
+  frameCamera();
   renderer.render(scene, camera);
   window.__b64 = canvas.toDataURL('image/png').split(',')[1];
   return window.__b64.length;

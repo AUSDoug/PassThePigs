@@ -12,14 +12,18 @@ public static class Strategies
     /// <summary>Display names in id order (for drop-downs).</summary>
     public static readonly string[] Names = { "Basic", "Random", "Aggressive", "Expert", "EV (stop at 23)" };
 
-    public static IRollStrategy ById(int id) => id switch
+    public static IRollStrategy ById(int id, bool exactWin = false)
     {
-        Random => new RandomStrategy(),
-        Aggressive => new AggressiveStrategy(),
-        Expert => new ExpertStrategy(),
-        Ev => new EvStrategy(),
-        _ => new BasicStrategy(),
-    };
+        IRollStrategy s = id switch
+        {
+            Random => new RandomStrategy(),
+            Aggressive => new AggressiveStrategy(),
+            Expert => new ExpertStrategy(),
+            Ev => new EvStrategy(),
+            _ => new BasicStrategy(),
+        };
+        return exactWin ? new ExactFinishStrategy(s) : s;
+    }
 
     /// <summary>
     /// Parses a benchmark spec: "basic" | "random" | "aggressive" | "ev" | "expert"
