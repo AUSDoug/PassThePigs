@@ -18,12 +18,10 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool _exactWin;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(AiDelayLabel))]
+    [NotifyPropertyChangedFor(nameof(AiDelayValue))]
     private double _aiRollDelay;
 
-    public string AiDelayLabel => Snap(AiRollDelay) <= 0
-        ? "Instant - no pig graphics on the opponent's turn"
-        : $"{Snap(AiRollDelay)} ms between the opponent's rolls";
+    public string AiDelayValue => Snap(AiRollDelay) <= 0 ? "Instant" : $"{Snap(AiRollDelay)} ms";
 
     public SettingsViewModel()
     {
