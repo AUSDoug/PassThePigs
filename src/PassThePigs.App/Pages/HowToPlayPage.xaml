@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PassThePigs.App.ViewModels"
+             x:Class="PassThePigs.App.Pages.HowToPlayPage"
+             x:DataType="vm:HowToPlayViewModel"
+             Title="How to Play">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="28,20" Spacing="6">
+
+            <!-- Screen 1: Title & the toss -->
+            <Label Text="How to Play" FontSize="30" FontAttributes="Bold"
+                   TextColor="{StaticResource Primary}"
+                   HorizontalOptions="Center" Margin="0,4,0,0" />
+            <Label Text="Two pigs. One table. Nerves of steel."
+                   FontSize="13" TextColor="{StaticResource Gray500}"
+                   HorizontalOptions="Center" HorizontalTextAlignment="Center" Margin="0,0,0,4" />
+
+            <Label Text="The toss" FontSize="19" FontAttributes="Bold" Margin="0,16,0,0" />
+            <Label Text="Each turn you throw two pigs. Where they land decides your score - there are six positions a pig can come to rest in, and it's the combination of the two that's worth points."
+                   FontSize="14" />
+
+            <!-- Screen 2: Know your pigs -->
+            <Label Text="Know your pigs" FontSize="19" FontAttributes="Bold" Margin="0,20,0,0" />
+            <Label Text="Six ways a pig can land. Learn the names - the scoring table uses them."
+                   FontSize="14" />
+
+            <Grid ColumnDefinitions="56,*" ColumnSpacing="14" Margin="0,10,0,0">
+                <Image Grid.Column="0" Source="side_blank.png" WidthRequest="56" HeightRequest="56" Aspect="AspectFit" />
+                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                    <Label Text="Sider" FontAttributes="Bold" />
+                    <Label Text="On its side, blank flank facing up." FontSize="12" TextColor="{StaticResource Gray500}" />
+                </VerticalStackLayout>
+            </Grid>
+            <Grid ColumnDefinitions="56,*" ColumnSpacing="14" Margin="0,10,0,0">
+                <Image Grid.Column="0" Source="side_dot.png" WidthRequest="56" HeightRequest="56" Aspect="AspectFit" />
+                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                    <Label Text="Sider (dot)" FontAttributes="Bold" />
+                    <Label Text="On its side, dotted flank facing up." FontSize="12" TextColor="{StaticResource Gray500}" />
+                </VerticalStackLayout>
+            </Grid>
+            <Grid ColumnDefinitions="56,*" ColumnSpacing="14" Margin="0,10,0,0">
+                <Image Grid.Column="0" Source="razorback_dot.png" WidthRequest="56" HeightRequest="56" Aspect="AspectFit" />
+                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                    <Label Text="Razorback" FontAttributes="Bold" />
+                    <Label Text="Flat on its back, trotters in the air." FontSize="12" TextColor="{StaticResource Gray500}" />
+                </VerticalStackLayout>
+            </Grid>
+            <Grid ColumnDefinitions="56,*" ColumnSpacing="14" Margin="0,10,0,0">
+                <Image Grid.Column="0" Source="trotter_dot.png" WidthRequest="56" HeightRequest="56" Aspect="AspectFit" />
+                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                    <Label Text="Trotter" FontAttributes="Bold" />
+                    <Label Text="Upright on all four trotters." FontSize="12" TextColor="{StaticResource Gray500}" />
+                </VerticalStackLayout>
+            </Grid>
+            <Grid ColumnDefinitions="56,*" ColumnSpacing="14" Margin="0,10,0,0">
+                <Image Grid.Column="0" Source="snouter_dot.png" WidthRequest="56" HeightRequest="56" Aspect="AspectFit" />
+                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                    <Label Text="Snouter" FontAttributes="Bold" />
+                    <Label Text="Tipped forward, resting on snout and both front trotters." FontSize="12" TextColor="{StaticResource Gray500}" />
+                </VerticalStackLayout>
+            </Grid>
+            <Grid ColumnDefinitions="56,*" ColumnSpacing="14" Margin="0,10,0,0">
+                <Image Grid.Column="0" Source="jowler_dot.png" WidthRequest="56" HeightRequest="56" Aspect="AspectFit" />
+                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                    <Label Text="Leaning Jowler" FontAttributes="Bold" />
+                    <Label Text="Rolled onto one jowl, propped on snout and a single trotter." FontSize="12" TextColor="{StaticResource Gray500}" />
+                </VerticalStackLayout>
+            </Grid>
+
+            <Label Text="Roughly: Sider 65% of the time between the two flanks, Razorback 22%, Trotter 9%, Snouter 3%, Leaning Jowler under 1%."
+                   FontSize="11" TextColor="{StaticResource Gray500}" Margin="0,12,0,0" />
+
+            <!-- Screen 3: What it's worth -->
+            <Label Text="What it's worth" FontSize="19" FontAttributes="Bold" Margin="0,20,0,0" />
+            <Label Text="Score the two pigs together, as a pair." FontSize="14" />
+
+            <Label Text="Both pigs on their side" FontSize="14" FontAttributes="Bold"
+                   TextColor="{StaticResource Gray600}" Margin="0,14,0,4" />
+            <Grid ColumnDefinitions="*,Auto" Margin="0,2,0,0">
+                <Label Grid.Column="0" Text="Matching flanks - both dots up, or both down" FontSize="13" VerticalOptions="Center" />
+                <Label Grid.Column="1" Text="1" FontAttributes="Bold" VerticalOptions="Center" />
+            </Grid>
+            <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                <Label Grid.Column="0" Text="Mixed flanks - one dot up, one down" FontSize="13" VerticalOptions="Center" />
+                <Label Grid.Column="1" Text="Pig Out" FontAttributes="Bold" TextColor="{StaticResource Primary}" VerticalOptions="Center" />
+            </Grid>
+            <Label Text="The only place the dot matters." FontSize="11" TextColor="{StaticResource Gray500}" Margin="0,4,0,0" />
+
+            <Label Text="One Sider, one other pig" FontSize="14" FontAttributes="Bold"
+                   TextColor="{StaticResource Gray600}" Margin="0,14,0,4" />
+            <Grid ColumnDefinitions="*,Auto" Margin="0,2,0,0">
+                <Label Grid.Column="0" Text="Sider with Razorback" FontSize="13" VerticalOptions="Center" />
+                <Label Grid.Column="1" Text="5" FontAttributes="Bold" VerticalOptions="Center" />
+            </Grid>
+            <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                <Label Grid.Column="0" Text="Sider with Trotter" FontSize="13" VerticalOptions="Center" />
+                <Label Grid.Column="1" Text="5" FontAttributes="Bold" VerticalOptions="Center" />
+            </Grid>
+            <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                <Label Grid.Column="0" Text="Sider with Snouter" FontSize="13" VerticalOptions="Center" />
+                <Label Grid.Column="1" Text="10" FontAttributes="Bold" VerticalOptions="Center" />
+            </Grid>
+            <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                <Label Grid.Column="0" Text="Sider with Leaning Jowler" FontSize="13" VerticalOptions="Center" />
+                <Label Grid.Column="1" Text="15" FontAttributes="Bold" VerticalOptions="Center" />
+            </Grid>
+            <Label Text="The dot makes no difference here." FontSize="11" TextColor="{StaticResource Gray500}" Margin="0,4,0,0" />
+
+            <Label Text="Neither pig on its side" FontSize="14" FontAttributes="Bold"
+                   TextColor="{StaticResource Gray600}" Margin="0,14,0,4" />
+            <Grid ColumnDefinitions="*,Auto" Margin="0,2,0,0">
+                <Label Grid.Column="0" Text="Double Razorback" FontSize="13" VerticalOptions="Center" />
+                <Label Grid.Column="1" Text="20" FontAttributes="Bold" VerticalOptions="Center" />
+            </Grid>
+            <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                <Label Grid.Column="0" Text="Razorback with Trotter" FontSize="13" VerticalOptions="Center" />
+                <Label Grid.Column="1" Text="10" FontAttributes="Bold" VerticalOptions="Center" />
+            </Grid>
+            <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                <Label Grid.Column="0" Text="Razorback with Snouter" FontSize="13" VerticalOptions="Center" />
+                <Label Grid.Column="1" Text="10 or 15*" FontAttributes="Bold" VerticalOptions="Center" />
+            </Grid>
+            <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                <Label Grid.Column="0" Text="Razorback with Leaning Jowler" FontSize="13" VerticalOptions="Center" />
+                <Label Grid.Column="1" Text="20" FontAttributes="Bold" VerticalOptions="Center" />
+            </Grid>
+            <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                <Label Grid.Column="0" Text="Double Trotter" FontSize="13" VerticalOptions="Center" />
+                <Label Grid.Column="1" Text="20" FontAttributes="Bold" VerticalOptions="Center" />
+            </Grid>
+            <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                <Label Grid.Column="0" Text="Trotter with Snouter" FontSize="13" VerticalOptions="Center" />
+                <Label Grid.Column="1" Text="15" FontAttributes="Bold" VerticalOptions="Center" />
+            </Grid>
+            <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                <Label Grid.Column="0" Text="Trotter with Leaning Jowler" FontSize="13" VerticalOptions="Center" />
+                <Label Grid.Column="1" Text="20" FontAttributes="Bold" VerticalOptions="Center" />
+            </Grid>
+            <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                <Label Grid.Column="0" Text="Double Snouter" FontSize="13" VerticalOptions="Center" />
+                <Label Grid.Column="1" Text="40" FontAttributes="Bold" VerticalOptions="Center" />
+            </Grid>
+            <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                <Label Grid.Column="0" Text="Snouter with Leaning Jowler" FontSize="13" VerticalOptions="Center" />
+                <Label Grid.Column="1" Text="25" FontAttributes="Bold" VerticalOptions="Center" />
+            </Grid>
+            <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                <Label Grid.Column="0" Text="Double Leaning Jowler" FontSize="13" VerticalOptions="Center" />
+                <Label Grid.Column="1" Text="60" FontAttributes="Bold" VerticalOptions="Center" />
+            </Grid>
+
+            <Border Stroke="{StaticResource Primary}" StrokeThickness="1.5"
+                    StrokeShape="RoundRectangle 14" Padding="16,14" Margin="0,16,0,0"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource StageDark}}">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Pig Out" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                    <Label Text="Two Siders with mismatched flanks - one dot up, one dot down - is a Pig Out. Your turn score is wiped to zero and your turn ends immediately."
+                           FontSize="13" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="*Razorback with Snouter scores 10 or 15 depending on which pig is doing the snouting - it isn't random or averaged, it's carried over from the original scoring card."
+                   FontSize="11" TextColor="{StaticResource Gray500}" Margin="0,8,0,0" />
+
+            <!-- Screen 4: Your turn at the trough -->
+            <Label Text="Your turn at the trough" FontSize="19" FontAttributes="Bold" Margin="0,20,0,0" />
+            <Label Text="On your turn you may toss the pigs as many times as you like. Every toss adds to your turn score - but that whole score is at risk for as long as you keep going."
+                   FontSize="14" />
+            <Label Text="Pass at any time to bank your turn score into your total and end your turn. Pig Out instead, and you bank nothing."
+                   FontSize="14" Margin="0,8,0,0" />
+            <Label Text="First player to reach the target score wins. The standard target is 100; you can change it in Settings."
+                   FontSize="14" Margin="0,8,0,0" />
+
+            <VerticalStackLayout Spacing="4" Margin="0,10,0,0">
+                <Label Text="1. Toss - add to your turn score." FontSize="13" TextColor="{StaticResource Gray500}" />
+                <Label Text="2. Toss again, or pass to bank it." FontSize="13" TextColor="{StaticResource Gray500}" />
+                <Label Text="3. Pig Out and the turn score is gone." FontSize="13" TextColor="{StaticResource Gray500}" />
+            </VerticalStackLayout>
+
+            <!-- Screen 5: House rule -->
+            <Label Text="House rule: exact finish" FontSize="19" FontAttributes="Bold" Margin="0,20,0,0" />
+            <Label Text="With &quot;must hit the target exactly&quot; switched on in Settings, a toss that would push your total past the target forfeits that whole turn instead of banking it."
+                   FontSize="14" />
+
+            <Button Text="Close" Command="{Binding DoneCommand}"
+                    Margin="0,24,0,0" HeightRequest="50"
+                    FontSize="17" FontAttributes="Bold" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

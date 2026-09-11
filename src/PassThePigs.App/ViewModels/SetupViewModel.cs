@@ -40,6 +40,9 @@ public partial class SetupViewModel : ObservableObject
     [RelayCommand]
     private static Task OpenStatsAsync() => Shell.Current.GoToAsync(nameof(StatsPage));
 
+    [RelayCommand]
+    private static Task OpenHowToPlayAsync() => Shell.Current.GoToAsync(nameof(HowToPlayPage));
+
     private static string NameFor(int id) =>
         Strategies.Names[Math.Clamp(id, 0, Strategies.Names.Length - 1)];
 }

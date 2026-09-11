@@ -97,10 +97,16 @@ function buildPig({ dot = true, hips = {} } = {}) {
     if (hips[tag]) hip.rotation.set(...hips[tag]);
   }
 
-  // curly tail
-  const tail = mesh('tail', new THREE.TorusGeometry(0.0032, 0.0011, 20, 40, Math.PI * 1.55), M.skin);
-  tail.position.set(0, 0.005, -0.017);
-  tail.rotation.set(0, Math.PI / 2, 0.5);
+  // curly tail: a short root leaving the rump, then a curl that sits clear
+  // of the body (rump surface at this height is z ≈ -0.0155)
+  const tailRoot = mesh('tail_root', new THREE.CylinderGeometry(0.0013, 0.0016, 0.0034, 20), M.skin);
+  tailRoot.rotation.set(Math.PI / 2 - 0.42, 0, 0);
+  tailRoot.position.set(0, 0.0059, -0.0166);
+  pig.add(tailRoot);
+
+  const tail = mesh('tail', new THREE.TorusGeometry(0.0027, 0.001, 18, 44, Math.PI * 1.62), M.skin);
+  tail.position.set(0, 0.0082, -0.0192);
+  tail.rotation.set(0, Math.PI / 2, -0.62);
   pig.add(tail);
 
   if (dot) {

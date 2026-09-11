@@ -56,6 +56,12 @@
                     <TapGestureRecognizer Command="{Binding OpenStatsCommand}" />
                 </Label.GestureRecognizers>
             </Label>
+            <Label Text="📖" FontSize="22" Padding="10"
+                   HorizontalOptions="Center" SemanticProperties.Description="How to play">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding OpenHowToPlayCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
         </VerticalStackLayout>
     </Grid>
 </ContentPage>
