@@ -16,6 +16,7 @@ public partial class GameViewModel : ObservableObject
 
     // The opponent's real name; only shown once "Random" mode reaches game over.
     private string _cpuRealName = "";
+    private int _aiId;
 
     [ObservableProperty] private int _roundNumber;
     [ObservableProperty] private string _targetLabel = "";
@@ -71,11 +72,11 @@ public partial class GameViewModel : ObservableObject
     /// <summary>Begin a fresh game from the current settings. Call when the page appears.</summary>
     public void Start()
     {
-        int aiId = GameSettings.RandomOpponent
+        _aiId = GameSettings.RandomOpponent
             ? _rng.Next(Strategies.Names.Length)
             : GameSettings.OpponentAi;
-        _opponent = Strategies.ById(aiId, GameSettings.ExactWin);
-        _cpuRealName = Strategies.Names[aiId];
+        _opponent = Strategies.ById(_aiId, GameSettings.ExactWin);
+        _cpuRealName = Strategies.Names[_aiId];
         CpuName = GameSettings.RandomOpponent ? "Opponent" : _cpuRealName;
 
         int start = GameSettings.FirstTurn switch
@@ -128,6 +129,26 @@ public partial class GameViewModel : ObservableObject
 
     [RelayCommand]
     private void PlayAgain() => Start();
+
+    /// <summary>
+    /// Bound to the Shell back button (and the Android hardware/gesture back button
+    /// via GamePage.OnBackButtonPressed) so leaving mid-game needs confirmation.
+    /// Once the game is decided - or nothing has happened yet to lose - it just leaves.
+    /// </summary>
+    [RelayCommand]
+    private async Task RequestExitAsync()
+    {
+        if (!IsGameOver && HasRolled)
+        {
+            bool leave = await Shell.Current.DisplayAlert(
+                "Leave this game?",
+                "Your game is still in progress and won't be saved if you leave now.",
+                "Leave", "Keep playing");
+            if (!leave) return;
+        }
+
+        await Shell.Current.GoToAsync("..");
+    }
 
     private async Task RunOpponentTurnAsync()
     {
@@ -184,9 +205,20 @@ public partial class GameViewModel : ObservableObject
         {
             IsGameOver = true;
             CpuName = _cpuRealName;   // reveal the "Random" opponent now the game's done
-            ResultText = _game.WinnerIndex == HumanIndex
-                ? $"You beat {_cpuRealName}! 🎉"
-                : $"{_cpuRealName} wins.";
+            bool won = _game.WinnerIndex == HumanIndex;
+            ResultText = won ? $"You beat {_cpuRealName}! 🎉" : $"{_cpuRealName} wins.";
+
+            GameHistoryService.RecordGame(new GameRecord
+            {
+                PlayedAtUtc = DateTime.UtcNow,
+                OpponentId = _aiId,
+                Won = won,
+                YourScore = _game.Players[HumanIndex].TotalScore,
+                OpponentScore = _game.Players[HumanIndex ^ 1].TotalScore,
+                TargetScore = _game.WinScore,
+                ExactWin = _game.ExactWin,
+                Rounds = _game.RoundNumber,
+            });
         }
     }
 

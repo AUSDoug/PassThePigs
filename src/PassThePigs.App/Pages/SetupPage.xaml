@@ -41,14 +41,21 @@
         </VerticalStackLayout>
     </ScrollView>
 
-        <!-- Settings -->
-        <Label Text="&#x2699;" FontSize="26" Padding="10"
-               TextColor="{StaticResource Gray500}"
-               HorizontalOptions="End" VerticalOptions="Start"
-               Margin="0,4,8,0" SemanticProperties.Description="Settings">
-            <Label.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding OpenSettingsCommand}" />
-            </Label.GestureRecognizers>
-        </Label>
+        <!-- Settings / Statistics -->
+        <VerticalStackLayout HorizontalOptions="End" VerticalOptions="Start" Margin="0,4,4,0" Spacing="0">
+            <Label Text="&#x2699;" FontSize="26" Padding="10"
+                   TextColor="{StaticResource Gray500}"
+                   HorizontalOptions="Center" SemanticProperties.Description="Settings">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding OpenSettingsCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
+            <Label Text="📊" FontSize="22" Padding="10"
+                   HorizontalOptions="Center" SemanticProperties.Description="Statistics">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding OpenStatsCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
+        </VerticalStackLayout>
     </Grid>
 </ContentPage>

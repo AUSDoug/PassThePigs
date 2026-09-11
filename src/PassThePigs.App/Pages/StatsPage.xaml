@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PassThePigs.App.ViewModels"
+             x:Class="PassThePigs.App.Pages.StatsPage"
+             x:DataType="vm:StatsViewModel"
+             Title="Statistics">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="28,20" Spacing="9">
+
+            <!-- Empty state -->
+            <VerticalStackLayout IsVisible="{Binding NoHistory}" Spacing="8"
+                                  VerticalOptions="Center" Margin="0,80,0,0">
+                <Label Text="🐷" FontSize="48" HorizontalOptions="Center" />
+                <Label Text="No games yet" FontSize="18" FontAttributes="Bold"
+                       HorizontalOptions="Center" />
+                <Label Text="Finish a game to start tracking your stats."
+                       FontSize="13" TextColor="{StaticResource Gray500}"
+                       HorizontalOptions="Center" HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout IsVisible="{Binding HasHistory}" Spacing="9">
+
+                <Label Text="RECORD" FontSize="12" FontAttributes="Bold"
+                       TextColor="{StaticResource Gray500}" />
+
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" Text="Games played" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="{Binding GamesPlayed}"
+                           FontAttributes="Bold" VerticalOptions="Center" />
+                </Grid>
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" Text="Win / loss" VerticalOptions="Center" />
+                    <Label Grid.Column="1" FontAttributes="Bold" VerticalOptions="Center">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="{Binding WinLossRecord}" />
+                                <Span Text="  " />
+                                <Span Text="{Binding WinPercentage}" TextColor="{StaticResource Gray500}" FontAttributes="None" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </Grid>
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" Text="Fastest win" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="{Binding FastestWin}"
+                           FontAttributes="Bold" VerticalOptions="Center" />
+                </Grid>
+
+                <Label Text="STREAKS" FontSize="12" FontAttributes="Bold"
+                       TextColor="{StaticResource Gray500}" Margin="0,12,0,0" />
+
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" Text="Current streak" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="{Binding CurrentStreakLabel}"
+                           FontAttributes="Bold" VerticalOptions="Center" />
+                </Grid>
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" Text="Best win streak" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="{Binding BestWinStreakLabel}"
+                           FontAttributes="Bold" VerticalOptions="Center" />
+                </Grid>
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" Text="Longest losing streak" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="{Binding WorstLoseStreakLabel}"
+                           FontAttributes="Bold" VerticalOptions="Center" />
+                </Grid>
+
+                <Label Text="OPPONENTS" FontSize="12" FontAttributes="Bold"
+                       TextColor="{StaticResource Gray500}" Margin="0,12,0,0" />
+
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" Text="Most played" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="{Binding MostCommonOpponent}"
+                           FontAttributes="Bold" VerticalOptions="Center" />
+                </Grid>
+                <Grid ColumnDefinitions="*,Auto" Margin="0,3,0,0">
+                    <Label Grid.Column="0" Text="Best against" VerticalOptions="Center" />
+                    <VerticalStackLayout Grid.Column="1" Spacing="0" HorizontalOptions="End">
+                        <Label Text="{Binding BestAgainstName}" FontAttributes="Bold" HorizontalTextAlignment="End" />
+                        <Label Text="{Binding BestAgainstDetail}" FontSize="11"
+                               TextColor="{StaticResource Gray500}" HorizontalTextAlignment="End" />
+                    </VerticalStackLayout>
+                </Grid>
+                <Grid ColumnDefinitions="*,Auto" Margin="0,3,0,0">
+                    <Label Grid.Column="0" Text="Toughest opponent" VerticalOptions="Center" />
+                    <VerticalStackLayout Grid.Column="1" Spacing="0" HorizontalOptions="End">
+                        <Label Text="{Binding WorstAgainstName}" FontAttributes="Bold" HorizontalTextAlignment="End" />
+                        <Label Text="{Binding WorstAgainstDetail}" FontSize="11"
+                               TextColor="{StaticResource Gray500}" HorizontalTextAlignment="End" />
+                    </VerticalStackLayout>
+                </Grid>
+
+            </VerticalStackLayout>
+
+            <Button Text="Reset statistics" Command="{Binding ResetStatisticsCommand}"
+                    IsVisible="{Binding HasHistory}"
+                    Margin="0,24,0,0" HeightRequest="44" CornerRadius="8"
+                    FontSize="14" BackgroundColor="Transparent"
+                    TextColor="#B3261E" BorderColor="#B3261E" BorderWidth="1" />
+
+            <Button Text="Close" Command="{Binding DoneCommand}"
+                    Margin="0,12,0,0" HeightRequest="50"
+                    FontSize="17" FontAttributes="Bold" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

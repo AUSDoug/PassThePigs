@@ -24,6 +24,16 @@ public partial class GamePage : ContentPage
         _vm.Start();
     }
 
+    // The Shell toolbar back arrow goes through Shell.BackButtonBehavior in the XAML;
+    // this catches the Android hardware/gesture back button the same way, so both
+    // routes hit the same confirmation logic.
+    protected override bool OnBackButtonPressed()
+    {
+        if (_vm.RequestExitCommand.CanExecute(null))
+            _vm.RequestExitCommand.Execute(null);
+        return true;
+    }
+
     private async void OnRollShown(PigRoll roll)
     {
         string js =

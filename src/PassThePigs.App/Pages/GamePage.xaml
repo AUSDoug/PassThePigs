@@ -6,6 +6,13 @@
              x:DataType="vm:GameViewModel"
              Title="Pass the Pigs">
 
+    <!-- Intercept the back arrow (and, via OnBackButtonPressed, the hardware/gesture
+         back button) so leaving mid-game asks for confirmation instead of silently
+         abandoning the run. -->
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding RequestExitCommand}" />
+    </Shell.BackButtonBehavior>
+
     <Grid RowDefinitions="Auto,Auto,*,Auto,Auto" Padding="16,10,16,16" RowSpacing="12">
 
         <VerticalStackLayout Grid.Row="0" Spacing="1" HorizontalOptions="Center">
