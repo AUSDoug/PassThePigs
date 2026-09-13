@@ -94,8 +94,43 @@
 
             </VerticalStackLayout>
 
+            <VerticalStackLayout IsVisible="{Binding HasPlayStyle}" Spacing="9">
+
+                <Label Text="PLAY STYLE" FontSize="12" FontAttributes="Bold"
+                       TextColor="{StaticResource Gray500}" Margin="0,12,0,0" />
+
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" Text="Tosses" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="{Binding TotalTosses}"
+                           FontAttributes="Bold" VerticalOptions="Center" />
+                </Grid>
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" Text="Pig-out rate" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="{Binding PigOutRate}"
+                           FontAttributes="Bold" VerticalOptions="Center" />
+                </Grid>
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" Text="Average bank" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="{Binding AverageBank}"
+                           FontAttributes="Bold" VerticalOptions="Center" />
+                </Grid>
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" Text="Biggest bank" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="{Binding BiggestBank}"
+                           FontAttributes="Bold" VerticalOptions="Center" />
+                </Grid>
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" Text="Past the safe point (23)" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="{Binding PushesPastSafe}"
+                           FontAttributes="Bold" VerticalOptions="Center" />
+                </Grid>
+                <Label Text="How often you bank after the point where rolling on stops paying off, on average."
+                       FontSize="11" TextColor="{StaticResource Gray500}" />
+
+            </VerticalStackLayout>
+
             <Button Text="Reset statistics" Command="{Binding ResetStatisticsCommand}"
-                    IsVisible="{Binding HasHistory}"
+                    IsVisible="{Binding HasAnyData}"
                     Margin="0,24,0,0" HeightRequest="44" CornerRadius="8"
                     FontSize="14" BackgroundColor="Transparent"
                     TextColor="#B3261E" BorderColor="#B3261E" BorderWidth="1" />

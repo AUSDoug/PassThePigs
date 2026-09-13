@@ -4,6 +4,9 @@ namespace PassThePigs.App.Services;
 /// System.Text.Json can round-trip it without a custom constructor.</summary>
 public sealed class GameRecord
 {
+    /// <summary>Links to the <see cref="DecisionRecord"/>s logged during this game.</summary>
+    public Guid GameId { get; set; }
+
     public DateTime PlayedAtUtc { get; set; }
 
     /// <summary>The opponent actually played (the drawn AI, even under "Random").</summary>

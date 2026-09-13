@@ -8,7 +8,7 @@ namespace PassThePigs.Console;
 ///
 ///   PassThePigs.Console bench games=&lt;n&gt; seed=&lt;n&gt; p1=&lt;spec&gt; p2=&lt;spec&gt;
 ///
-/// &lt;spec&gt; is basic | random | aggressive | ev | expert | expert:&lt;n&gt;.
+/// &lt;spec&gt; is basic | random | aggressive | ev | expert | expert:&lt;n&gt; | expert:&lt;n&gt;,&lt;n&gt;.
 /// The first turn alternates between the two sides so first-mover advantage is
 /// split evenly. Prints one line:
 ///

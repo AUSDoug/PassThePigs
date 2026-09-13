@@ -17,6 +17,7 @@ public partial class GameViewModel : ObservableObject
     // The opponent's real name; only shown once "Random" mode reaches game over.
     private string _cpuRealName = "";
     private int _aiId;
+    private Guid _gameId;
 
     [ObservableProperty] private int _roundNumber;
     [ObservableProperty] private string _targetLabel = "";
@@ -72,6 +73,7 @@ public partial class GameViewModel : ObservableObject
     /// <summary>Begin a fresh game from the current settings. Call when the page appears.</summary>
     public void Start()
     {
+        _gameId = Guid.NewGuid();
         _aiId = GameSettings.RandomOpponent
             ? _rng.Next(Strategies.Names.Length)
             : GameSettings.OpponentAi;
@@ -104,7 +106,22 @@ public partial class GameViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanRoll))]
     private async Task RollAsync()
     {
+        int myTotal = _game.Active.TotalScore;
+        int myTurn = _game.Active.TurnScore;
+        int oppTotal = _game.Opponent.TotalScore;
+
         PigRoll roll = _game.Roll();
+
+        DecisionHistoryService.RecordDecision(new DecisionRecord
+        {
+            GameId = _gameId,
+            MyTotal = myTotal,
+            MyTurn = myTurn,
+            OpponentTotal = oppTotal,
+            Rolled = true,
+            PigOut = roll.IsPigOut,
+        });
+
         ShowRoll("You", roll);
         if (_game.ExactWin && !_game.IsOver && _game.ActiveIndex == HumanIndex
             && _game.Active.ProjectedTotal > _game.WinScore)
@@ -117,8 +134,22 @@ public partial class GameViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanPass))]
     private async Task PassAsync()
     {
+        int myTotal = _game.Active.TotalScore;
+        int myTurn = _game.Active.TurnScore;
+        int oppTotal = _game.Opponent.TotalScore;
         int projected = _game.Active.ProjectedTotal;
+
         _game.Pass();
+
+        DecisionHistoryService.RecordDecision(new DecisionRecord
+        {
+            GameId = _gameId,
+            MyTotal = myTotal,
+            MyTurn = myTurn,
+            OpponentTotal = oppTotal,
+            Rolled = false,
+        });
+
         Caption = _game.ExactWin && projected > _game.WinScore && !_game.IsOver
             ? $"Over {_game.WinScore} - you lose the turn."
             : "You hold.";
@@ -210,6 +241,7 @@ public partial class GameViewModel : ObservableObject
 
             GameHistoryService.RecordGame(new GameRecord
             {
+                GameId = _gameId,
                 PlayedAtUtc = DateTime.UtcNow,
                 OpponentId = _aiId,
                 Won = won,

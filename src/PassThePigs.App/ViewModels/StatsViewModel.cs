@@ -12,10 +12,15 @@ namespace PassThePigs.App.ViewModels;
 public partial class StatsViewModel : ObservableObject
 {
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(NoHistory))]
+    [NotifyPropertyChangedFor(nameof(NoHistory), nameof(HasAnyData))]
     private bool _hasHistory;
 
     public bool NoHistory => !HasHistory;
+
+    /// <summary>Whether there's anything to reset - a game can be abandoned mid-play
+    /// (see GameViewModel.RequestExitAsync), leaving decisions logged with no finished
+    /// game to show for them, so this isn't just <see cref="HasHistory"/>.</summary>
+    public bool HasAnyData => HasHistory || HasPlayStyle;
 
     [ObservableProperty] private int _gamesPlayed;
     [ObservableProperty] private string _winLossRecord = "—";
@@ -34,10 +39,28 @@ public partial class StatsViewModel : ObservableObject
 
     [ObservableProperty] private string _fastestWin = "—";
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(NoPlayStyle), nameof(HasAnyData))]
+    private bool _hasPlayStyle;
+
+    public bool NoPlayStyle => !HasPlayStyle;
+
+    [ObservableProperty] private string _totalTosses = "—";
+    [ObservableProperty] private string _pigOutRate = "—";
+    [ObservableProperty] private string _averageBank = "—";
+    [ObservableProperty] private string _biggestBank = "—";
+    [ObservableProperty] private string _pushesPastSafe = "—";
+
+    // Gorman's EV break-even: rolling is worth it below a turn score of ~23, a wash
+    // above it. It's the threshold Expert/EV already play to (see EvStrategy).
+    private const int SafeStopPoint = 23;
+
     public StatsViewModel() => Load();
 
     private void Load()
     {
+        LoadPlayStyle();
+
         var games = GameHistoryService.All;
         GamesPlayed = games.Count;
         HasHistory = GamesPlayed > 0;
@@ -80,16 +103,41 @@ public partial class StatsViewModel : ObservableObject
         FastestWin = fastest is null ? "—" : $"{Rounds(fastest.Rounds)} vs {NameFor(fastest.OpponentId)}";
     }
 
+    private void LoadPlayStyle()
+    {
+        var decisions = DecisionHistoryService.All;
+        HasPlayStyle = decisions.Count > 0;
+        if (!HasPlayStyle)
+        {
+            TotalTosses = PigOutRate = AverageBank = BiggestBank = PushesPastSafe = "—";
+            return;
+        }
+
+        var rolls = decisions.Where(d => d.Rolled).ToList();
+        var passes = decisions.Where(d => !d.Rolled).ToList();
+
+        TotalTosses = rolls.Count.ToString();
+        PigOutRate = rolls.Count > 0
+            ? $"{Math.Round(100.0 * rolls.Count(r => r.PigOut) / rolls.Count)}%"
+            : "—";
+        AverageBank = passes.Count > 0 ? $"{Math.Round(passes.Average(p => p.MyTurn))} pts" : "—";
+        BiggestBank = passes.Count > 0 ? $"{passes.Max(p => p.MyTurn)} pts" : "—";
+        PushesPastSafe = passes.Count > 0
+            ? $"{Math.Round(100.0 * passes.Count(p => p.MyTurn > SafeStopPoint) / passes.Count)}%"
+            : "—";
+    }
+
     [RelayCommand]
     private async Task ResetStatisticsAsync()
     {
         bool confirmed = await Shell.Current.DisplayAlert(
             "Reset statistics?",
-            "This permanently deletes your game history. This can't be undone.",
+            "This permanently deletes your game history and play-style data. This can't be undone.",
             "Reset", "Cancel");
         if (!confirmed) return;
 
         GameHistoryService.ClearAll();
+        DecisionHistoryService.ClearAll();
         Load();
     }
 
